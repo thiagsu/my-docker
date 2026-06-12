@@ -1,0 +1,55 @@
+
+services:
+  back-end:
+    build: ./back-end
+    ports:
+      - "4000:4000"
+
+    environment:
+      TZ: America/New York
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: S0ccer123
+      DB_NAME: soccer
+      PUZZLE_DB_HOST: mysql
+      PUZZLE_DB_PORT: 3306
+      PUZZLE_DB_USER: root
+      PUZZLE_DB_PASSWORD: S0ccer123
+      PUZZLE_DB_NAME: puzzle
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  front-end:
+    build: ./front-end
+    ports:
+      - "3000:80"
+    depends_on:
+      - back-end
+
+
+  mysql:
+    image: mysql:latest
+    environment:
+      TZ: America/New_York
+      MYSQL_ROOT_PASSWORD: S0ccer123
+      MYSQL_DATABASE: soccer
+        - TZ=America/New_York
+    ports:
+      - "3306:3306"
+    volumes:
+      - pgdata:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pS0ccer123"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+
+
+
+volumes:
+  pgdata:
